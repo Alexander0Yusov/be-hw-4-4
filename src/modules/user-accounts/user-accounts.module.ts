@@ -16,6 +16,7 @@ import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthQueryRepository } from './infrastructure/query/auth-query.repository';
 import { BasicStrategy } from './guards/basic/basic.strategy';
+import { UserAccountsConfig } from './user-accounts.config';
 import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -34,6 +35,8 @@ import {
   ],
   controllers: [UsersController, AuthController, SecurityDevicesController],
   providers: [
+    UserAccountsConfig,
+    //
     UsersService,
     UsersRepository,
     UsersQueryRepository,

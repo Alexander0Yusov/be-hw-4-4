@@ -1,19 +1,28 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
+import { initAppModule } from './init-app-module';
+import { CoreConfig } from './core/core.config';
 
 // Не экспортируйте ничего из main.ts, чтобы избежать повторного запуска приложения
 // при выполнении тестов. (Node.js автоматически выполняет код импортируемого файла.)
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // выполнена реализация через динамич настройку
+  // const app = await NestFactory.create(AppModule);
+
+  const dynamicAppModule = await initAppModule();
+  // создаём на основе донастроенного модуля наше приложение
+  const app = await NestFactory.create(dynamicAppModule);
 
   appSetup(app);
 
-  const PORT = process.env.PORT || 5001;
+  // const PORT = process.env.PORT || 5001;
 
-  await app.listen(PORT, () => {
-    console.log('Server is running on port ' + PORT);
+  const coreConfig = app.get<CoreConfig>(CoreConfig);
+  const port = coreConfig.port;
+
+  await app.listen(port, () => {
+    console.log('Server is running on port ' + port);
   });
 }
 

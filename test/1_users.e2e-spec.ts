@@ -16,6 +16,8 @@ import {
 import { delay } from './helpers/delay';
 import { EmailService } from '../src/modules/mailer/email.service';
 import { EmailServiceMock } from './mock/email-service.mock';
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from 'src/modules/user-accounts/constants/auth-tokens.inject-constants';
+import { CoreConfig } from 'src/core/core.config';
 
 describe('users (e2e)', () => {
   let app: INestApplication<App>;
@@ -24,12 +26,17 @@ describe('users (e2e)', () => {
 
   beforeAll(async () => {
     const result = await initSettings((moduleBuilder) =>
-      moduleBuilder.overrideProvider(JwtService).useValue(
-        new JwtService({
-          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '2s' },
+      moduleBuilder
+        .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
+        .useFactory({
+          factory: (coreConfig: CoreConfig) => {
+            return new JwtService({
+              secret: coreConfig.accessTokenSecret,
+              signOptions: { expiresIn: '2s' },
+            });
+          },
+          inject: [CoreConfig],
         }),
-      ),
     );
 
     app = result.app;
