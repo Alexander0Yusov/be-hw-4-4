@@ -26,8 +26,6 @@ export class EmailService {
     code: string,
     template: (code: string) => string,
   ): Promise<boolean> {
-    console.log(100000000, 'email activated');
-
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {

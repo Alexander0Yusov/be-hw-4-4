@@ -21,10 +21,47 @@ import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from './constants/auth-tokens.inject-constants';
+import { CoreConfig } from 'src/core/core.config';
+import { RefreshJwtStrategy } from './guards/bearer-refresh/refresh-jwt.strategy';
+import { SessionsRepository } from './infrastructure/sessions.repository';
+import { SessionsQueryRepository } from './infrastructure/query/sessions-query.repository';
+import { Session, SessionSchema } from './domain/session/session.entity';
+import { CreateTokensPairUseCase } from './application/usecases/auth/create-tokens-pair.usecase';
+import { CreateSessionUseCase } from './application/usecases/sessions/create-session.usecase';
+import { RevokingSessionUseCase } from './application/usecases/sessions/revoking-session.usecase';
+import { TerminateAllExcludeCurrentSessionUseCase } from './application/usecases/sessions/terminate-all-exclude-current-session.usecase';
+import { GetAllSessionsHandler } from './application/usecases/sessions/get-all-sessions.query-handler';
+import { TerminateByIdUseCase } from './application/usecases/sessions/terminate-by-id-session.usecase';
+import { UpdateSessionUseCase } from './application/usecases/sessions/update-session.usecase';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
+export const CommandHandlers = [
+  CreateTokensPairUseCase,
+  CreateSessionUseCase,
+  UpdateSessionUseCase,
+  RevokingSessionUseCase,
+  TerminateByIdUseCase,
+  TerminateAllExcludeCurrentSessionUseCase,
+];
+
+export const QueryHandlers = [GetAllSessionsHandler];
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'User', schema: UserSchema },
+      { name: Session.name, schema: SessionSchema },
+    ]),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 10_000,
+          limit: 5,
+        },
+      ],
+    }),
     NotificationsModule,
     // JwtModule.register({
     //   secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
@@ -49,34 +86,42 @@ import {
     BasicStrategy,
     LocalStrategy,
     JwtStrategy,
+    RefreshJwtStrategy,
     //
     SecurityDevicesService,
+    //
+    SessionsRepository,
+    SessionsQueryRepository,
+
+    ...CommandHandlers,
+    ...QueryHandlers,
     //
     //пример инстанцирования через токен
     //если надо внедрить несколько раз один и тот же класс
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (coreConfig: CoreConfig): JwtService => {
         return new JwtService({
-          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '5m' },
+          secret: coreConfig.accessTokenSecret,
+          signOptions: { expiresIn: coreConfig.accessTokenExpireIn },
         });
       },
-      inject: [
-        /*TODO: inject configService. will be in the following lessons*/
-      ],
+      inject: [CoreConfig],
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (coreConfig: CoreConfig): JwtService => {
         return new JwtService({
-          secret: 'refresh-token-secret', //TODO: move to env. will be in the following lessons
-          signOptions: { expiresIn: '24h' },
+          secret: coreConfig.refreshTokenSecret,
+          signOptions: { expiresIn: coreConfig.refreshTokenExpireIn },
         });
       },
-      inject: [
-        /*TODO: inject configService. will be in the following lessons*/
-      ],
+      inject: [CoreConfig],
+    },
+
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
   exports: [UsersQueryRepository],

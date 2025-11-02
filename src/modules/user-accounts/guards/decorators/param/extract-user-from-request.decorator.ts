@@ -8,8 +8,6 @@ export const ExtractUserFromRequest = createParamDecorator(
     const user = request.user;
 
     if (!user) {
-      console.log(999999999999999999999999999);
-
       throw new Error('there is no user in the request object!');
     }
 

@@ -54,13 +54,20 @@ export class AuthService {
     //   expiresIn: '5m',
     // });
 
+    // сохранять сессию. создать обьект сессии, сохранить в репозиторий.
+    // deviceId,
+    // userId ,
+    // createdAt: new Date(),
+    // expiresAt: addSeconds(new Date(), Number(SETTINGS.REFRESH_TIME)),
+    // isRevoked: false,
+
     const accessToken = this.accessTokenContext.sign({
       id: userId,
     });
 
     const refreshToken = this.refreshTokenContext.sign({
       id: userId,
-      deviceId: 'deviceId',
+      deviceId: uuidv4(),
     });
 
     return {

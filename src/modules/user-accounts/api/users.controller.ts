@@ -19,8 +19,6 @@ import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
 import { GetUsersQueryParams } from '../dto/user/get-users-query-params.input-dto';
 import { UpdateUserDto } from '../dto/user/create-user-domain.dto';
 import { BasicAuthGuard } from '../guards/basic/basi-auth.guard';
-import { DomainException } from '../../../core/exceptions/domain-exceptions';
-import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
 @Controller('users')
 export class UsersController {

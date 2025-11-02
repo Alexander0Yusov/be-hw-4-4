@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsBoolean, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 import { configValidationUtility } from 'src/setup/config-validation.utility';
+import { IsExpiresInFormat } from './decorators/transform/is-expires-in-format';
+import { JwtSignOptions } from '@nestjs/jwt';
 
 export enum Environments {
   DEVELOPMENT = 'development',
@@ -47,11 +49,29 @@ export class CoreConfig {
   })
   accessTokenSecret: string;
 
-  @IsBoolean({
+  @IsNotEmpty({
     message:
       'Set Env variable INCLUDE_TESTING_MODULE, dangerous for app lifecycle!',
   })
   includeTestingModule: boolean;
+
+  @IsNotEmpty({
+    message:
+      'Set Env variable ACCESS_TOKEN_EXPIRE_IN, dangerous for security!!',
+  })
+  @IsExpiresInFormat({
+    message: 'expiresIn должен быть числом или строкой вида "24h", "7d", "60s"',
+  })
+  accessTokenExpireIn: JwtSignOptions['expiresIn'];
+
+  @IsNotEmpty({
+    message:
+      'Set Env variable REFRESH_TOKEN_EXPIRE_IN, dangerous for security!!',
+  })
+  @IsExpiresInFormat({
+    message: 'expiresIn должен быть числом или строкой вида "24h", "7d", "60s"',
+  })
+  refreshTokenExpireIn: JwtSignOptions['expiresIn'];
 
   constructor(private configService: ConfigService<any, true>) {
     this.port = Number(this.configService.get('PORT'));
@@ -61,6 +81,10 @@ export class CoreConfig {
     this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
     this.includeTestingModule = Boolean(
       this.configService.get('INCLUDE_TESTING_MODULE'),
+    );
+    this.accessTokenExpireIn = this.configService.get('ACCESS_TOKEN_EXPIRE_IN');
+    this.refreshTokenExpireIn = this.configService.get(
+      'REFRESH_TOKEN_EXPIRE_IN',
     );
 
     configValidationUtility.validateConfig(this);
