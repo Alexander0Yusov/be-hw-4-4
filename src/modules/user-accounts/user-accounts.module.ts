@@ -33,8 +33,8 @@ import { TerminateAllExcludeCurrentSessionUseCase } from './application/usecases
 import { GetAllSessionsHandler } from './application/usecases/sessions/get-all-sessions.query-handler';
 import { TerminateByIdUseCase } from './application/usecases/sessions/terminate-by-id-session.usecase';
 import { UpdateSessionUseCase } from './application/usecases/sessions/update-session.usecase';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 export const CommandHandlers = [
   CreateTokensPairUseCase,
@@ -53,21 +53,12 @@ export const QueryHandlers = [GetAllSessionsHandler];
       { name: 'User', schema: UserSchema },
       { name: Session.name, schema: SessionSchema },
     ]),
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          name: 'default',
-          ttl: 10_000,
-          limit: 5,
-        },
-      ],
-    }),
-    NotificationsModule,
+
     // JwtModule.register({
     //   secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
     //   signOptions: { expiresIn: '5m' }, // Время жизни токена
     // }),
-
+    NotificationsModule,
     JwtModule,
   ],
   controllers: [UsersController, AuthController, SecurityDevicesController],
@@ -118,7 +109,7 @@ export const QueryHandlers = [GetAllSessionsHandler];
       },
       inject: [CoreConfig],
     },
-
+    //
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

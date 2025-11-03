@@ -1,31 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserContextDto } from '../guards/dto/user-context.dto';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { CryptoService } from './crupto.service';
-import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays } from 'date-fns';
 import { EmailService } from '../../../modules/mailer/email.service';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
-import {
-  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-} from '../constants/auth-tokens.inject-constants';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersRepository: UsersRepository,
-    private jwtService: JwtService,
     private cryptoService: CryptoService,
     private emailService: EmailService,
-
-    @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
-    private accessTokenContext: JwtService,
-
-    @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
-    private refreshTokenContext: JwtService,
   ) {}
 
   async validateUser(
@@ -47,33 +35,6 @@ export class AuthService {
     }
 
     return { id: user.id.toString() };
-  }
-
-  async login(userId: string) {
-    // const accessToken = this.jwtService.sign({ id: userId } as UserContextDto, {
-    //   expiresIn: '5m',
-    // });
-
-    // сохранять сессию. создать обьект сессии, сохранить в репозиторий.
-    // deviceId,
-    // userId ,
-    // createdAt: new Date(),
-    // expiresAt: addSeconds(new Date(), Number(SETTINGS.REFRESH_TIME)),
-    // isRevoked: false,
-
-    const accessToken = this.accessTokenContext.sign({
-      id: userId,
-    });
-
-    const refreshToken = this.refreshTokenContext.sign({
-      id: userId,
-      deviceId: uuidv4(),
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-    };
   }
 
   async sendRecoveryPasswordCode(email: string): Promise<void> {

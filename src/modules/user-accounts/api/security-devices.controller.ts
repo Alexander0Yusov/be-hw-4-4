@@ -17,6 +17,7 @@ import { TerminateAllExcludeCurrentSessionCommand } from '../application/usecase
 import { TerminateByIdCommand } from '../application/usecases/sessions/terminate-by-id-session.usecase';
 import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('security')
 export class SecurityDevicesController {
   constructor(
@@ -25,7 +26,6 @@ export class SecurityDevicesController {
   ) {}
 
   @Get('devices')
-  @SkipThrottle()
   @UseGuards(RefreshJwtAuthGuard)
   async getDevices(
     @Device() deviceContext: DeviceContextDto,
@@ -36,7 +36,6 @@ export class SecurityDevicesController {
   }
 
   @Delete('devices')
-  @SkipThrottle()
   @UseGuards(RefreshJwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteDevicesExcludeCurrent(
@@ -51,7 +50,6 @@ export class SecurityDevicesController {
   }
 
   @Delete('devices/:id')
-  @SkipThrottle()
   @UseGuards(RefreshJwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteDeviceById(

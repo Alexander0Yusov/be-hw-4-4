@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreatePostDomainDto } from '../../dto/post/create-post-domain.dto';
-import { Like, LikeDocument, LikeSchema } from '../like/like.entity';
 import { PostUpdateDto } from '../../dto/post/post-update.dto';
 import { LikeForArrayViewDto } from '../../dto/like/like-for-array-view.dto';
 
@@ -71,13 +70,6 @@ export class Post {
     this.dislikesCount = disLikes;
     this.newestLikes = newestLikes;
   }
-
-  // makeDeleted() {
-  //   if (this.deletedAt !== null) {
-  //     throw new Error('Entity already deleted');
-  //   }
-  //   this.deletedAt = new Date();
-  // }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

@@ -1,6 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DomainExceptionCode } from 'src/core/exceptions/domain-exception-codes';
-import { DomainException } from 'src/core/exceptions/domain-exceptions';
 import { LikeInputDto } from 'src/modules/bloggers-platform/dto/like/like-input.dto';
 import { CommentsRepository } from 'src/modules/bloggers-platform/infrastructure/comments.repository';
 import { LikesRepository } from 'src/modules/bloggers-platform/infrastructure/likes.repository';

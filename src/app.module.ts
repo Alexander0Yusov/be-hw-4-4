@@ -12,6 +12,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { MailerModule } from './modules/mailer/mailer.module';
 import { CoreModule } from './core/core.module';
 import { CoreConfig } from './core/core.config';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 // nest g module modules/user-accounts
 // nest g controller modules/user-accounts --no-spec
@@ -33,6 +34,15 @@ import { CoreConfig } from './core/core.config';
       },
       inject: [CoreConfig],
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 10000,
+          limit: 5,
+        },
+      ],
+    }),
 
     BloggersPlatformModule,
     UserAccountsModule,
@@ -41,7 +51,7 @@ import { CoreConfig } from './core/core.config';
     CoreModule,
     configModule,
 
-    // выполнена реализация по альтернативному пути через static async forRoot()
+    // выполнена реализация по альтернативному пути через метод static async forRoot() в этом же классе
     //...(process.env.INCLUDE_TESTING_MODULE ? [TestingModule] : []),
   ],
   controllers: [AppController],

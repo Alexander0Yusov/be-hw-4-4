@@ -5,6 +5,7 @@ import {
   Extension,
 } from '../../../../core/exceptions/domain-exceptions';
 
+// файл не актуален
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private readonly requests = new Map<string, number[]>();

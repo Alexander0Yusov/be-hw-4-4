@@ -11,9 +11,8 @@ import {
 } from '@nestjs/common';
 import { UserInputDto } from '../dto/user/user-input.dto';
 import { UsersService } from '../application/users.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { LocalAuthGuard } from '../guards/local/local-auth.guard';
-import { Nullable, UserContextDto } from '../guards/dto/user-context.dto';
+import { UserContextDto } from '../guards/dto/user-context.dto';
 import { AuthService } from '../application/auth.service';
 import { ExtractUserFromRequest } from '../guards/decorators/param/extract-user-from-request.decorator';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
@@ -111,14 +110,12 @@ export class AuthController {
     );
   }
 
-  // @ApiBearerAuth()
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async me(@ExtractUserFromRequest() user: UserContextDto): Promise<MeViewDto> {
     return await this.authQueryRepository.me(user.id);
   }
 
-  // @UseGuards(RateLimitGuard)
   @Post('password-recovery')
   @Throttle({ default: {} })
   @HttpCode(HttpStatus.NO_CONTENT)

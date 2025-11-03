@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 import { configValidationUtility } from 'src/setup/config-validation.utility';
 import { IsExpiresInFormat } from './decorators/transform/is-expires-in-format';
 import { JwtSignOptions } from '@nestjs/jwt';

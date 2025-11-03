@@ -38,10 +38,6 @@ export class GetCommentUseCase
       }
     }
 
-    const ff = CommentViewDto.mapToView(comment);
-
-    console.log(777777, '------', ff);
-
-    return ff;
+    return CommentViewDto.mapToView(comment);
   }
 }
